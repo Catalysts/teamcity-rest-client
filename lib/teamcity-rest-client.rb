@@ -91,7 +91,7 @@ module TeamcityRestClient
     end
   end
   
-  Build = Struct.new(:teamcity, :id, :number, :status, :build_type_id, :start_date, :href, :web_url) do
+  Build = Struct.new(:teamcity, :id, :number, :status, :running, :build_type_id, :start_date, :href, :web_url) do
     def success?
       status == :SUCCESS
     end
@@ -195,7 +195,7 @@ class Teamcity
   
   def builds options = {}
     doc(get('/app/rest/builds', options).gsub(/&buildTypeId/,'&amp;buildTypeId')).elements.collect('//build') do |e|
-      TeamcityRestClient::Build.new(self, e.av('id'), e.av('number'), e.av('status').to_sym, e.av('buildTypeId'), e.av_or('startDate', ''), url(e.av('href')), e.av('webUrl'))
+      TeamcityRestClient::Build.new(self, e.av('id'), e.av('number'), e.av('status').to_sym, e.av_or('running', 'false'), e.av('buildTypeId'), e.av_or('startDate', ''), url(e.av('href')), e.av('webUrl'))
     end
   end
   
